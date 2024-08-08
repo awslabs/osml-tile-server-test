@@ -1,25 +1,39 @@
+# Temporary files
 *~
 *#
 *.swp
+
+# IDE files
 *.iml
 *.DS_Store
-*.tox
 *.idea
+
+# Python virtual environments
 *venv
+
+# Tox environment files
+*.tox
+
+# Text files
 *aggregated_results.txt
 
+# Python compiled files
 __pycache__/
 *.py[cod]
 *$py.class
 *.egg-info/
 
-/.coverage
-/.coverage.*
-/.cache
-/.pytest_cache
-/.mypy_cache
+# Coverage reports
+.coverage
+.coverage.*
+.cache
+.pytest_cache
+.mypy_cache
 
+# Documentation auto-generated files
 /doc/_apidoc/
+
+# Build and distribution directories
 /build
 /dist
 /htmlcov
