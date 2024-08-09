@@ -11,4 +11,4 @@ jobs:
       with:
         lfs: 'true'
     - name: Build the Docker Container
-      run: docker build . --file Dockerfile --tag osml-tile-server-test:$(date +%s)
+      run: docker build . --file docker/Dockerfile.integ --tag osml-tile-server-test:$(date +%s)
