@@ -1,12 +1,12 @@
 #  Copyright 2024 Amazon.com, Inc. or its affiliates.
-
+import os
 from typing import Any, Dict
 
 
 class TileServerIntegTestConfig:
-    def __init__(self, endpoint: str, s3_bucket: str, s3_key: str):
+    def __init__(self, s3_bucket: str, s3_key: str):
         # Tile Server
-        self.endpoint = endpoint
+        self.endpoint = os.getenv("TS_ENDPOINT")
 
         # S3
         self.test_bucket = s3_bucket
