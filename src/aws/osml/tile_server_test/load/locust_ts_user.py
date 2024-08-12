@@ -154,12 +154,14 @@ class TileServerUser(FastHttpUser):
         :param test_image_key: key of the test image
         :return: ID of the created viewpoint or None
         """
+        id = token_hex(16)
         with self.rest(
             "POST",
             "/viewpoints",
             name="CreateViewpoint",
             json={
-                "viewpoint_name": "LocustUser-Viewpoint-" + token_hex(16),
+                "viewpoint_id": id,
+                "viewpoint_name": "LocustUser-Viewpoint-" + id,
                 "bucket_name": test_images_bucket,
                 "object_key": test_image_key,
                 "tile_size": tile_size,

@@ -1,7 +1,7 @@
 #  Copyright 2024 Amazon.com, Inc. or its affiliates.
 
 # flake8: noqa
-from .test_create_viewpoint import create_viewpoint, create_viewpoint_invalid
+from .test_create_viewpoint import create_viewpoint, create_viewpoint_invalid, create_viewpoint_invalid_id
 from .test_delete_viewpoint import delete_viewpoint, delete_viewpoint_invalid
 from .test_describe_viewpoint import describe_viewpoint, describe_viewpoint_invalid
 from .test_get_bounds import get_bounds, get_bounds_invalid
