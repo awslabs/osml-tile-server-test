@@ -12,6 +12,7 @@ from requests import Session
 from .endpoints import (  # get_statistics,
     create_viewpoint,
     create_viewpoint_invalid,
+    create_viewpoint_invalid_id,
     delete_viewpoint,
     delete_viewpoint_invalid,
     describe_viewpoint,
@@ -120,6 +121,16 @@ class TestTileServer:
             logging.info(f"\tFailed. {err}")
             logging.error(traceback.print_exception(err))
             self.test_results["Create Viewpoint - Invalid"] = TestResult.FAILED
+        try:
+            logging.info("Testing create invalid viewpoint ID")
+            viewpoint_with_invalid_id = self.config.test_viewpoint.copy()
+            viewpoint_with_invalid_id["viewpoint_id"] = "tricky/id"
+            create_viewpoint_invalid_id(self.session, self.viewpoints_url, viewpoint_with_invalid_id)
+            self.test_results["Create Viewpoint - Invalid ID"] = TestResult.PASSED
+        except Exception as err:
+            logging.info(f"\tFailed. {err}")
+            logging.error(traceback.print_exception(err))
+            self.test_results["Create Viewpoint - Invalid ID"] = TestResult.FAILED
         try:
             logging.info("Testing create viewpoint")
             self.viewpoint_id = create_viewpoint(self.session, self.viewpoints_url, self.config.test_viewpoint)
