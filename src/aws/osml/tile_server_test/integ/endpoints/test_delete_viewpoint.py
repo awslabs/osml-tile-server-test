@@ -16,12 +16,7 @@ def delete_viewpoint(session: Session, url: str, viewpoint_id: str) -> None:
     res = session.delete(f"{url}/{viewpoint_id}")
     res.raise_for_status()
 
-    response_data = res.json()
-
-    assert res.status_code == 200
-    assert response_data["viewpoint_status"] == "DELETED"
-    assert response_data["local_object_path"] is None
-    assert response_data["expire_time"] is not None
+    assert res.status_code == 204
 
 
 def delete_viewpoint_invalid(session: Session, url: str, viewpoint_id: str) -> None:
@@ -39,6 +34,4 @@ def delete_viewpoint_invalid(session: Session, url: str, viewpoint_id: str) -> N
     response_data = res.json()
 
     assert res.status_code == 404
-    assert (
-        "Cannot view ViewpointApiNames.UPDATE for this image since this has already been deleted" in response_data["detail"]
-    )
+    assert f"viewpoint_id {viewpoint_id} not found." in response_data["detail"]
