@@ -2,38 +2,41 @@
 *~
 *#
 *.swp
-
-# IDE files
-*.iml
 *.DS_Store
-*.idea
-
-# Python virtual environments
-*venv
-
-# Tox environment files
-*.tox
-
-# Text files
+*.iml
 *aggregated_results.txt
 
-# Python compiled files
+# IDE directories
+.idea/
+.vscode/
+
+# Virtual environments
+venv/
+.tox/
+
+# Python bytecode
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Distribution / packaging
 *.egg-info/
+build/
+dist/
 
 # Coverage reports
 .coverage
 .coverage.*
+htmlcov/
+
+# Test and cache directories
 .cache
-.pytest_cache
-.mypy_cache
+.pytest_cache/
+.mypy_cache/
+test_tmp/
+tox_conda_tmp*
 
-# Documentation auto-generated files
-/doc/_apidoc/
-
-# Build and distribution directories
-/build
-/dist
-/htmlcov
+# Documentation build directories
+doc/_apidoc/
+doc/_spec/
+doc/autoapi/

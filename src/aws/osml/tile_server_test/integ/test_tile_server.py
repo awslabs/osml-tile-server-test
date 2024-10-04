@@ -9,7 +9,7 @@ from typing import Dict
 
 from requests import Session
 
-from .endpoints import (  # get_statistics,
+from .endpoints import (
     create_viewpoint,
     create_viewpoint_invalid,
     create_viewpoint_invalid_id,
@@ -24,6 +24,8 @@ from .endpoints import (  # get_statistics,
     get_map_tilesets,
     get_metadata,
     get_preview,
+    get_statistics,
+    get_statistics_invalid,
     get_tile,
     list_viewpoints,
     update_viewpoint,
@@ -90,7 +92,7 @@ class TestTileServer:
         self.test_get_map_tile()
         self.test_delete_viewpoint()
         test_summary = self._pretty_print_test_results(self.test_results)
-        if TestResult.FAILED in self.test_results.values():
+        if TestResult.FAILED in [res["result"] for res in self.test_results.values()]:
             raise Exception(test_summary)
         logging.info(test_summary)
 
@@ -116,189 +118,239 @@ class TestTileServer:
         try:
             logging.info("Testing create invalid viewpoint")
             create_viewpoint_invalid(self.session, self.viewpoints_url, self.config.invalid_viewpoint)
-            self.test_results["Create Viewpoint - Invalid"] = TestResult.PASSED
+            self.test_results["Create Viewpoint - Invalid"] = {"result": TestResult.PASSED}
         except Exception as err:
             logging.info(f"\tFailed. {err}")
             logging.error(traceback.print_exception(err))
-            self.test_results["Create Viewpoint - Invalid"] = TestResult.FAILED
+            self.test_results["Create Viewpoint - Invalid"] = {
+                "result": TestResult.FAILED,
+                "message": self._get_exception_summary(err),
+            }
         try:
             logging.info("Testing create invalid viewpoint ID")
             viewpoint_with_invalid_id = self.config.test_viewpoint.copy()
             viewpoint_with_invalid_id["viewpoint_id"] = "tricky/id"
             create_viewpoint_invalid_id(self.session, self.viewpoints_url, viewpoint_with_invalid_id)
-            self.test_results["Create Viewpoint - Invalid ID"] = TestResult.PASSED
+            self.test_results["Create Viewpoint - Invalid ID"] = {"result": TestResult.PASSED}
         except Exception as err:
             logging.info(f"\tFailed. {err}")
             logging.error(traceback.print_exception(err))
-            self.test_results["Create Viewpoint - Invalid ID"] = TestResult.FAILED
+            self.test_results["Create Viewpoint - Invalid ID"] = {
+                "result": TestResult.FAILED,
+                "message": self._get_exception_summary(err),
+            }
         try:
             logging.info("Testing create viewpoint")
             self.viewpoint_id = create_viewpoint(self.session, self.viewpoints_url, self.config.test_viewpoint)
-            self.test_results["Create Viewpoint"] = TestResult.PASSED
+            self.test_results["Create Viewpoint"] = {"result": TestResult.PASSED}
         except Exception as err:
             logging.info(f"\tFailed. {err}")
             logging.error(traceback.print_exception(err))
-            self.test_results["Create Viewpoint"] = TestResult.FAILED
+            self.test_results["Create Viewpoint"] = {
+                "result": TestResult.FAILED,
+                "message": self._get_exception_summary(err),
+            }
 
     def test_describe_viewpoint(self) -> None:
         try:
             logging.info("Testing describe viewpoint")
             describe_viewpoint(self.session, self.viewpoints_url, self.viewpoint_id)
-            self.test_results["Describe Viewpoint"] = TestResult.PASSED
+            self.test_results["Describe Viewpoint"] = {"result": TestResult.PASSED}
         except Exception as err:
             logging.info(f"\tFailed. {err}")
             logging.error(traceback.print_exception(err))
-            self.test_results["Describe Viewpoint"] = TestResult.FAILED
+            self.test_results["Describe Viewpoint"] = {
+                "result": TestResult.FAILED,
+                "message": self._get_exception_summary(err),
+            }
 
     def test_list_viewpoints(self) -> None:
         try:
             logging.info("Testing list viewpoints")
             list_viewpoints(self.session, self.viewpoints_url)
-            self.test_results["List Viewpoints"] = TestResult.PASSED
+            self.test_results["List Viewpoints"] = {"result": TestResult.PASSED}
         except Exception as err:
             logging.info(f"\tFailed. {err}")
             logging.error(traceback.print_exception(err))
-            self.test_results["List Viewpoints"] = TestResult.FAILED
+            self.test_results["List Viewpoints"] = {"result": TestResult.FAILED, "message": self._get_exception_summary(err)}
 
     def test_update_viewpoint(self) -> None:
         try:
             logging.info("Testing update viewpoint")
             update_viewpoint(self.session, self.viewpoints_url, self.viewpoint_id, self.config.valid_update_test_body)
-            self.test_results["Update Viewpoint"] = TestResult.PASSED
+            self.test_results["Update Viewpoint"] = {"result": TestResult.PASSED}
         except Exception as err:
             logging.info(f"\tFailed. {err}")
             logging.error(traceback.print_exception(err))
-            self.test_results["Update Viewpoint"] = TestResult.FAILED
+            self.test_results["Update Viewpoint"] = {
+                "result": TestResult.FAILED,
+                "message": self._get_exception_summary(err),
+            }
 
     def test_get_metadata(self) -> None:
         try:
             logging.info("Testing get metadata")
             get_metadata(self.session, self.viewpoints_url, self.viewpoint_id)
-            self.test_results["Get Metadata"] = TestResult.PASSED
+            self.test_results["Get Metadata"] = {"result": TestResult.PASSED}
         except Exception as err:
             logging.info(f"\tFailed. {err}")
             logging.error(traceback.print_exception(err))
-            self.test_results["Get Metadata"] = TestResult.FAILED
+            self.test_results["Get Metadata"] = {"result": TestResult.FAILED, "message": self._get_exception_summary(err)}
 
     def test_get_bounds(self) -> None:
         try:
             logging.info("Testing get bounds")
             get_bounds(self.session, self.viewpoints_url, self.viewpoint_id)
-            self.test_results["Get Bounds"] = TestResult.PASSED
+            self.test_results["Get Bounds"] = {"result": TestResult.PASSED}
         except Exception as err:
             logging.info(f"\tFailed. {err}")
             logging.error(traceback.print_exception(err))
-            self.test_results["Get Bounds"] = TestResult.FAILED
+            self.test_results["Get Bounds"] = {"result": TestResult.FAILED, "message": self._get_exception_summary(err)}
 
     def test_get_info(self) -> None:
         try:
             logging.info("Testing get info")
             get_info(self.session, self.viewpoints_url, self.viewpoint_id)
-            self.test_results["Get Info"] = TestResult.PASSED
+            self.test_results["Get Info"] = {"result": TestResult.PASSED}
         except Exception as err:
             logging.info(f"\tFailed. {err}")
             logging.error(traceback.print_exception(err))
-            self.test_results["Get Info"] = TestResult.FAILED
+            self.test_results["Get Info"] = {"result": TestResult.FAILED, "message": self._get_exception_summary(err)}
 
     def test_get_statistics(self) -> None:
         try:
-            logging.info("Testing get statistics - ENABLED WHEN FIXED")
-            # get_statistics(self.session, self.viewpoints_url, self.viewpoint_id)
-            self.test_results["Get Statistics"] = TestResult.PASSED
+            logging.info("Testing get statistics")
+            get_statistics(self.session, self.viewpoints_url, self.viewpoint_id)
+            self.test_results["Get Statistics"] = {"result": TestResult.PASSED}
         except Exception as err:
             logging.info(f"\tFailed. {err}")
             logging.error(traceback.print_exception(err))
-            self.test_results["Get Statistics"] = TestResult.FAILED
+            self.test_results["Get Statistics"] = {"result": TestResult.FAILED, "message": self._get_exception_summary(err)}
+
+        try:
+            logging.info("Testing get statistics invalid")
+            get_statistics_invalid(self.session, self.viewpoints_url, self.viewpoint_id)
+            self.test_results["Get Statistics - Invalid"] = {"result": TestResult.PASSED}
+        except Exception as err:
+            logging.info(f"\tFailed. {err}")
+            logging.error(traceback.print_exception(err))
+            self.test_results["Get Statistics - Invalid"] = {
+                "result": TestResult.FAILED,
+                "message": self._get_exception_summary(err),
+            }
 
     def test_get_preview(self) -> None:
         try:
             logging.info("Testing get preview")
             get_preview(self.session, self.viewpoints_url, self.viewpoint_id)
-            self.test_results["Get Preview"] = TestResult.PASSED
+            self.test_results["Get Preview"] = {"result": TestResult.PASSED}
         except Exception as err:
             logging.info(f"\tFailed. {err}")
             logging.error(traceback.print_exception(err))
-            self.test_results["Get Preview"] = TestResult.FAILED
+            self.test_results["Get Preview"] = {"result": TestResult.FAILED, "message": self._get_exception_summary(err)}
 
     def test_get_tile(self) -> None:
         try:
             logging.info("Testing get tile")
             get_tile(self.session, self.viewpoints_url, self.viewpoint_id)
-            self.test_results["Get Tile"] = TestResult.PASSED
+            self.test_results["Get Tile"] = {"result": TestResult.PASSED}
         except Exception as err:
             logging.info(f"\tFailed. {err}")
             logging.error(traceback.print_exception(err))
-            self.test_results["Get Tile"] = TestResult.FAILED
+            self.test_results["Get Tile"] = {"result": TestResult.FAILED, "message": self._get_exception_summary(err)}
 
     def test_get_crop(self) -> None:
         try:
             logging.info("Testing get crop")
             get_crop(self.session, self.viewpoints_url, self.viewpoint_id)
-            self.test_results["Get Crop"] = TestResult.PASSED
+            self.test_results["Get Crop"] = {"result": TestResult.PASSED}
         except Exception as err:
             logging.info(f"\tFailed. {err}")
             logging.error(traceback.print_exception(err))
-            self.test_results["Get Crop"] = TestResult.FAILED
+            self.test_results["Get Crop"] = {"result": TestResult.FAILED, "message": self._get_exception_summary(err)}
 
     def test_get_map_tilesets(self) -> None:
         try:
             logging.info("Testing get map tilesets")
             get_map_tilesets(self.session, self.viewpoints_url, self.viewpoint_id)
-            self.test_results["Get Map Tilesets"] = TestResult.PASSED
+            self.test_results["Get Map Tilesets"] = {"result": TestResult.PASSED}
         except Exception as err:
             logging.info(f"\tFailed. {err}")
             logging.error(traceback.print_exception(err))
-            self.test_results["Get Map Tilesets"] = TestResult.FAILED
+            self.test_results["Get Map Tilesets"] = {
+                "result": TestResult.FAILED,
+                "message": self._get_exception_summary(err),
+            }
 
     def test_get_map_tileset_metadata(self) -> None:
         try:
             logging.info("Testing get map tileset metadata")
             get_map_tileset_metadata(self.session, self.viewpoints_url, self.viewpoint_id, "WebMercatorQuad")
-            self.test_results["Get Map Tileset Metadata"] = TestResult.PASSED
+            self.test_results["Get Map Tileset Metadata"] = {"result": TestResult.PASSED}
         except Exception as err:
             logging.info(f"\tFailed. {err}")
             logging.error(traceback.print_exception(err))
-            self.test_results["Get Map Tileset Metadata"] = TestResult.FAILED
+            self.test_results["Get Map Tileset Metadata"] = {
+                "result": TestResult.FAILED,
+                "message": self._get_exception_summary(err),
+            }
 
     def test_get_map_tile(self) -> None:
         try:
             logging.info("Testing get map tile")
             get_map_tile(self.session, self.viewpoints_url, self.viewpoint_id)
-            self.test_results["Get Map Tile"] = TestResult.PASSED
+            self.test_results["Get Map Tile"] = {"result": TestResult.PASSED}
         except Exception as err:
             logging.info(f"\tFailed. {err}")
             logging.error(traceback.print_exception(err))
-            self.test_results["Get Map Tile"] = TestResult.FAILED
+            self.test_results["Get Map Tile"] = {"result": TestResult.FAILED, "message": self._get_exception_summary(err)}
 
     def test_delete_viewpoint(self) -> None:
         try:
             logging.info("Testing delete viewpoint")
             delete_viewpoint(self.session, self.viewpoints_url, self.viewpoint_id)
-            self.test_results["Delete Viewpoint"] = TestResult.PASSED
+            self.test_results["Delete Viewpoint"] = {"result": TestResult.PASSED}
         except Exception as err:
             logging.info(f"\tFailed. {err}")
             logging.error(traceback.print_exception(err))
-            self.test_results["Delete Viewpoint"] = TestResult.FAILED
+            self.test_results["Delete Viewpoint"] = {
+                "result": TestResult.FAILED,
+                "message": self._get_exception_summary(err),
+            }
         try:
             logging.info("Testing delete viewpoint invalid")  # viewpoint already deleted
             delete_viewpoint_invalid(self.session, self.viewpoints_url, self.viewpoint_id)
-            self.test_results["Delete Viewpoint - Invalid"] = TestResult.PASSED
+            self.test_results["Delete Viewpoint - Invalid"] = {"result": TestResult.PASSED}
         except Exception as err:
             logging.info(f"\tFailed. {err}")
             logging.error(traceback.print_exception(err))
-            self.test_results["Delete Viewpoint - Invalid"] = TestResult.FAILED
+            self.test_results["Delete Viewpoint - Invalid"] = {
+                "result": TestResult.FAILED,
+                "message": self._get_exception_summary(err),
+            }
 
     @staticmethod
     def _pretty_print_test_results(test_results: Dict[str, TestResult]) -> str:
         max_key_length = max([len(k) for k in test_results.keys()])
         sorted_results = dict(sorted(test_results.items(), key=lambda x: x[0].lower()))
-        test_counter = Counter(test_results.values())
+        test_counter = Counter([res["result"] for res in test_results.values()])
         results_str = "\nTest Summary\n-------------------------------------\n"
         for k, v in sorted_results.items():
-            results_str += f"{k.ljust(max_key_length + 5)}{v.value}\n"
+            result = v["result"]
+            if result is TestResult.PASSED:
+                results_str += f"{k.ljust(max_key_length + 5)}{result.value}\n"
+            elif result is TestResult.FAILED:
+                results_str += f"{k.ljust(max_key_length + 5)}{result.value} - {v['message']}\n"
         n_tests = len(test_results)
         passed = test_counter[TestResult.PASSED]
         failed = test_counter[TestResult.FAILED]
         success = passed / n_tests * 100
         results_str += f"    Tests: {n_tests}, Passed: {passed}, Failed: {failed}, Success: {success:.2f}%"
         return results_str
+
+    @staticmethod
+    def _get_exception_summary(err: Exception) -> str:
+        tb = traceback.extract_tb(err.__traceback__)
+        err_name = type(err).__name__
+        location = f"...{tb[-1].filename.split('src/aws/osml/')[-1]}, {tb[-1].name}, line {tb[-1].lineno}"
+        return f"{err_name}:{str(err)} in {location}: {tb[-1].line}"

@@ -25,19 +25,18 @@ class ProcessorBase(ABC):
         return {"statusCode": 200, "body": json.dumps(message)}
 
     @staticmethod
-    def failure_message(e: Exception) -> Dict[str, Any]:
+    def failure_message(err: Exception) -> Dict[str, Any]:
         """
         Returns an error message in the form of a dictionary, including a stack trace, intended for an HTTP response.
 
-        :param e: The exception that triggered the failure.
+        :param err: The exception that triggered the failure.
         :returns: A dictionary with 'statusCode' set to 500 and a 'body' containing the error message and stack trace.
         """
-        # Log the error and stack trace
         stack_trace = traceback.format_exc()
-        logger.error(f"Error executing tile sever test: {e}\nStack trace: {stack_trace}")
+        logger.error(err)
 
         # Return the error message and stack trace in the response
-        error_response = {"message": str(e), "stack_trace": stack_trace.splitlines()}
+        error_response = {"message": str(err), "stack_trace": stack_trace.splitlines()}
         return {"statusCode": 500, "body": json.dumps(error_response)}
 
     @abstractmethod
