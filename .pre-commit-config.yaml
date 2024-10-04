@@ -1,46 +1,51 @@
+ci:
+  skip:
+    # Skip the copyright check on pre-commit.ci because we don't have the Git history
+    - copyright
+    - copyright-required
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.6.0
     hooks:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace
 
   - repo: https://github.com/psf/black
-    rev: 23.1.0
+    rev: 24.8.0
     hooks:
       - id: black
         args: ["--line-length=125"]
         types: [file, python]
 
   - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
+    rev: 5.13.2
     hooks:
       - id: isort
         args: ["--line-length=125", "--profile=black"]
         types: [file, python]
 
   - repo: https://github.com/PyCQA/flake8
-    rev: 6.0.0
+    rev: 7.1.1
     hooks:
       - id: flake8
-        args: ["--ignore=E203,W503,W605", "--max-line-length=125"]
+        args: ["--max-line-length=125", "--max-complexity=10"]
         types: [file, python]
 
   - repo: https://github.com/pre-commit/mirrors-autopep8
-    rev: v2.0.1
+    rev: v2.0.4
     hooks:
       - id: autopep8
         args:
           [
-            '--ignore=["E203","W503","W605"]',
             "--max-line-length=125",
             "--in-place"
           ]
         types: [file, python]
 
-  - repo: https://github.com/sbrunner/pre-commit-copyright
-    rev: 0.7.0
+  - repo: https://github.com/sbrunner/hooks
+    rev: 1.1.1
     hooks:
       - id: copyright
         name: update copyright
