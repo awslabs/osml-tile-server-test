@@ -1,6 +1,6 @@
-# Copyright 2024 Amazon.com, Inc. or its affiliates.
+# Copyright 2024-2025 Amazon.com, Inc. or its affiliates.
 
-FROM public.ecr.aws/lambda/python:3.11 as integ
+FROM public.ecr.aws/lambda/python:3.11 AS integ
 
 # Build time arguments
 ARG BUILD_CERT=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
@@ -33,6 +33,11 @@ ENV PATH=/opt/conda/bin:$PATH
 
 # Copy conda ENV
 COPY conda/environment.yml ${LAMBDA_TASK_ROOT}
+
+# Accept Conda TOS before creating the environment
+RUN conda config --set always_yes true && \
+    conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
+    conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
 
 # Install python with conda
 RUN conda env create -n ${CONDA_ENV_NAME} --file environment.yml
