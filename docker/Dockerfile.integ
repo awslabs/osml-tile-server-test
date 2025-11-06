@@ -1,6 +1,6 @@
 # Copyright 2024-2025 Amazon.com, Inc. or its affiliates.
 
-FROM public.ecr.aws/lambda/python:3.11 AS integ
+FROM public.ecr.aws/lambda/python:3.13 AS integ
 
 # Build time arguments
 ARG BUILD_CERT=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
@@ -15,11 +15,11 @@ ARG PACKAGES="wget"
 # Give sudo permissions
 USER root
 
-# Configure, update, and refresh yum environment
-RUN yum update -y && yum clean all && yum makecache
+# Configure, update, and refresh dnf environment
+RUN dnf update -y && dnf clean all && dnf makecache
 
 # Install all our dependencies
-RUN yum install -y $PACKAGES
+RUN dnf install -y $PACKAGES
 
 # Install Miniconda
 RUN wget -c ${MINICONDA_URL} && \
@@ -47,7 +47,7 @@ ENV PATH=/opt/conda/envs/${CONDA_ENV_NAME}/bin/:$PATH
 ENV PYTHONPATH=/opt/conda/envs/${CONDA_ENV_NAME}/bin
 
 # We now replace the image’s existing Python with Python from the conda environment:
-RUN mv /var/lang/bin/python3.11 /var/lang/bin/python3.11-clean && ln -sf /opt/conda/envs/${CONDA_ENV_NAME}/bin/python /var/lang/bin/python3.11
+RUN mv /var/lang/bin/python3.13 /var/lang/bin/python3.13-clean && ln -sf /opt/conda/envs/${CONDA_ENV_NAME}/bin/python /var/lang/bin/python3.13
 
 # Clean up any dangling conda resources
 RUN conda clean -afy
